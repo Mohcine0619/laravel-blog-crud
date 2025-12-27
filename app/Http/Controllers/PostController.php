@@ -22,16 +22,27 @@ class PostController extends Controller
      */
     public function create()
     {
-        //
+        return view('posts.create');
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
-    {
-        //
-    }
+    public function store(Request $request, )
+{
+    $validated = $request->validate([
+        'title' => 'required|min:5|max:255',
+        'body' => 'required|min:20',
+    ]);
+
+    $post = Post::create([
+        'title' => $validated['title'],
+        'body' => $validated['body'],
+        'user_id' => 1,  
+    ]);
+
+    return redirect('/posts')->with('success', 'Post created successfully!');
+}
 
     /**
      * Display the specified resource.

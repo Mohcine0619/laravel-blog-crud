@@ -6,6 +6,9 @@
     </x-slot>
 
     <div class="space-y-8">
+        <a href="{{ route('posts.create') }}" class="inline-block mb-6 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700">
+    + New Post
+</a>
         @if($posts->isEmpty())
             <div class="text-center py-12 bg-white rounded-lg shadow">
                 <p class="text-gray-500 text-lg">No posts yet.</p>
