@@ -1,43 +1,38 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Blog - All Posts</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body class="bg-light">
-    <div class="container py-5">
-        <h1 class="mb-4">My Blog Posts</h1>
+<x-layouts.app>
 
-        @if($posts->count() == 0)
-            <p>No posts yet!</p>
+    <x-slot name="header">
+        <h1 class="text-4xl font-bold text-gray-900">All Posts</h1>
+        <p class="text-gray-600 mt-2">Latest thoughts and ideas</p>
+    </x-slot>
+
+    <div class="space-y-8">
+        @if($posts->isEmpty())
+            <div class="text-center py-12 bg-white rounded-lg shadow">
+                <p class="text-gray-500 text-lg">No posts yet.</p>
+            </div>
         @else
-            <div class="row">
-                @foreach($posts as $post)
-                    <div class="col-md-6 mb-4">
-                        <div class="card">
-                            <div class="card-body">
-                                <h5 class="card-title">
-                                    <a href="/posts/{{ $post->id }}" class="text-decoration-none">
-                                        {{ $post->title }}
-                                    </a>
-                                </h5>
-                                <p class="text-muted small">
-                                    By {{ $post->user->name }} • {{ $post->created_at->diffForHumans() }}
-                                </p>
-                                <p class="card-text">
-                                    {{ Str::limit($post->body, 150) }}
-                                </p>
-                                <p class="small text-muted">
-                                    {{ $post->comments->count() }} comment{{ $post->comments->count() != 1 ? 's' : '' }}
-                                </p>
-                            </div>
-                        </div>
+            @foreach($posts as $post)
+                <article class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow p-6">
+                    <h2 class="text-2xl font-bold mb-2">
+                        <a href="/posts/{{ $post->id }}" class="text-gray-900 hover:text-blue-600">
+                            {{ $post->title }}
+                        </a>
+                    </h2>
+                    <div class="text-sm text-gray-600 mb-4">
+                        By {{ $post->user->name }} • 
+                        {{ $post->created_at->diffForHumans() }} • 
+                        {{ $post->comments->count() }} {{ Str::plural('comment', $post->comments->count()) }}
                     </div>
-                @endforeach
+                    <p class="text-gray-700">
+                        {{ Str::limit($post->body, 200) }}
+                    </p>
+                </article>
+            @endforeach
+
+            <div class="mt-10">
+                {{ $posts->links('pagination::tailwind') }}
             </div>
         @endif
     </div>
-</body>
-</html>
+
+</x-layouts.app>

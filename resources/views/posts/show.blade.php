@@ -1,80 +1,54 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ $post->title }} - My Mini Blog</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        body { background-color: #f8f9fa; }
-    </style>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-</head>
-<body>
-    <div class="container py-5">
-        <a href="/posts" class="btn btn-secondary mb-4">← Back to Posts</a>
+<x-layouts.app>
 
-        <div class="card shadow">
-            <div class="card-body">
-                <h1 class="card-title">{{ $post->title }}</h1>
-                <p class="text-muted mb-4">
-                    By <strong>{{ $post->user->name }}</strong> • 
-                    {{ $post->created_at->format('M d, Y') }} • 
-                    {{ $post->comments->count() }} comment{{ $post->comments->count() != 1 ? 's' : '' }}
-                </p>
+    <x-slot name="header">
+        <a href="/posts" class="inline-block mb-4 text-blue-600 hover:text-blue-800 font-medium">
+            ← Back to posts
+        </a>
+        <h1 class="text-4xl font-bold text-gray-900">{{ $post->title }}</h1>
+        <p class="text-gray-600 mt-2">
+            By {{ $post->user->name }} • {{ $post->created_at->format('M d, Y') }}
+        </p>
+    </x-slot>
 
-                <div class="post-body mb-5">
-                    {!! nl2br(e($post->body)) !!}
-                </div>
+    <article class="bg-white rounded-lg shadow-lg p-8">
+        <div class="prose prose-lg max-w-none mb-12 text-gray-800">
+            {!! nl2br(e($post->body)) !!}
+        </div>
 
-                <hr>
+        <hr class="my-12">
 
-                {{-- Flash Success Message --}}
-@if (session('success'))
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
-        {{ session('success') }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    </div>
-@endif
+        <h3 class="text-2xl font-bold mb-6">Comments ({{ $post->comments->count() }})</h3>
 
-<hr>
-
-<h3 class="mt-5 mb-4">Comments ({{ $post->comments->count() }})</h3>
-
-{{-- Add Comment Form --}}
-<div class="card mb-4">
-    <div class="card-body">
-        <h6 class="card-subtitle mb-3 text-muted">Add a comment:</h6>
-        <form method="POST" action="{{ route('posts.comments.store', $post) }}">
-            @csrf
-            <div class="mb-3">
-                <textarea name="body" class="form-control @error('body') is-invalid @enderror" 
-                          rows="3" placeholder="What do you think about this post?"></textarea>
+        <!-- Comment Form -->
+        <div class="bg-gray-50 rounded-lg p-6 mb-8">
+            <form method="POST" action="{{ route('posts.comments.store', $post) }}">
+                @csrf
+                <textarea name="body" rows="4" class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-500" 
+                          placeholder="Share your thoughts..." required>{{ old('body') }}</textarea>
                 @error('body')
-                    <div class="invalid-feedback">{{ $message }}</div>
+                    <p class="text-red-500 text-sm mt-2">{{ $message }}</p>
                 @enderror
-            </div>
-            <button type="submit" class="btn btn-primary">Post Comment</button>
-        </form>
-    </div>
-</div>
+                <button type="submit" class="mt-4 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">
+                    Post Comment
+                </button>
+            </form>
+        </div>
 
-{{-- List of Comments --}}
-@if($post->comments->isEmpty())
-    <p class="text-muted">No comments yet. Be the first to comment!</p>
-@else
-    @foreach($post->comments()->latest()->get() as $comment) {{-- latest() = newest first --}}
-        <div class="border-start border-primary border-4 ps-4 mb-4 bg-light p-3 rounded">
-            <p class="mb-2">{!! nl2br(e($comment->body)) !!}</p>
-            <small class="text-muted">
-                💬 {{ $comment->created_at->diffForHumans() }} 
-                <span class="badge bg-secondary ms-2">{{ $comment->created_at->format('M d, Y H:i') }}</span>
-            </small>
-        </div>
-    @endforeach
-@endif
+        <!-- Comments List -->
+        @if($post->comments->isEmpty())
+            <p class="text-gray-500 italic">No comments yet. Be the first!</p>
+        @else
+            <div class="space-y-6">
+                @foreach($post->comments()->latest()->get() as $comment)
+                    <div class="bg-gray-50 rounded-lg p-6">
+                        <p class="text-gray-800 mb-3">{!! nl2br(e($comment->body)) !!}</p>
+                        <p class="text-sm text-gray-500">
+                            {{ $comment->created_at->diffForHumans() }}
+                        </p>
+                    </div>
+                @endforeach
             </div>
-        </div>
-    </div>
-</body>
-</html>
+        @endif
+    </article>
+
+</x-layouts.app>
