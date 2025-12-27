@@ -15,6 +15,7 @@ class PostController extends Controller
         $posts = Post::with('user')->latest()->get();
         return view('posts.index', compact('posts'));
     }
+    
 
     /**
      * Show the form for creating a new resource.
@@ -35,10 +36,14 @@ class PostController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
-    {
-        //
-    }
+    public function show(Post $post)
+{
+    
+    $post->load('user', 'comments');
+
+    
+    return view('posts.show', compact('post'));
+}
 
     /**
      * Show the form for editing the specified resource.
