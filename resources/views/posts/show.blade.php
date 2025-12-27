@@ -8,6 +8,7 @@
     <style>
         body { background-color: #f8f9fa; }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </head>
 <body>
     <div class="container py-5">
@@ -28,20 +29,50 @@
 
                 <hr>
 
-                <h3 class="mt-5 mb-4">Comments ({{ $post->comments->count() }})</h3>
+                {{-- Flash Success Message --}}
+@if (session('success'))
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        {{ session('success') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+@endif
 
-                @if($post->comments->isEmpty())
-                    <p class="text-muted">No comments yet. Be the first!</p>
-                @else
-                    @foreach($post->comments as $comment)
-                        <div class="border-start border-primary border-4 ps-4 mb-4">
-                            <p class="mb-2">{!! nl2br(e($comment->body)) !!}</p>
-                            <small class="text-muted">
-                                Commented on {{ $comment->created_at->diffForHumans() }}
-                            </small>
-                        </div>
-                    @endforeach
-                @endif
+<hr>
+
+<h3 class="mt-5 mb-4">Comments ({{ $post->comments->count() }})</h3>
+
+{{-- Add Comment Form --}}
+<div class="card mb-4">
+    <div class="card-body">
+        <h6 class="card-subtitle mb-3 text-muted">Add a comment:</h6>
+        <form method="POST" action="{{ route('posts.comments.store', $post) }}">
+            @csrf
+            <div class="mb-3">
+                <textarea name="body" class="form-control @error('body') is-invalid @enderror" 
+                          rows="3" placeholder="What do you think about this post?"></textarea>
+                @error('body')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+            </div>
+            <button type="submit" class="btn btn-primary">Post Comment</button>
+        </form>
+    </div>
+</div>
+
+{{-- List of Comments --}}
+@if($post->comments->isEmpty())
+    <p class="text-muted">No comments yet. Be the first to comment!</p>
+@else
+    @foreach($post->comments()->latest()->get() as $comment) {{-- latest() = newest first --}}
+        <div class="border-start border-primary border-4 ps-4 mb-4 bg-light p-3 rounded">
+            <p class="mb-2">{!! nl2br(e($comment->body)) !!}</p>
+            <small class="text-muted">
+                💬 {{ $comment->created_at->diffForHumans() }} 
+                <span class="badge bg-secondary ms-2">{{ $comment->created_at->format('M d, Y H:i') }}</span>
+            </small>
+        </div>
+    @endforeach
+@endif
             </div>
         </div>
     </div>
