@@ -21,6 +21,20 @@
                             {{ $post->title }}
                         </a>
                     </h2>
+                    <div class="flex space-x-4 mb-12">
+        <a href="{{ route('posts.edit', $post) }}" class="bg-yellow-600 text-white px-6 py-3 rounded-lg hover:bg-yellow-700">
+        Edit Post
+        </a>
+
+        <form method="POST" action="{{ route('posts.destroy', $post) }}" class="inline">
+        @csrf
+        @method('DELETE')
+        <button type="submit" onclick="return confirm('Are you sure you want to delete this post? All comments will be deleted too.')" 
+                class="bg-red-600 text-white px-6 py-3 rounded-lg hover:bg-red-700">
+            Delete Post
+        </button>
+        </form>
+        </div>
                     <div class="text-sm text-gray-600 mb-4">
                         By {{ $post->user->name }} • 
                         {{ $post->created_at->diffForHumans() }} • 
