@@ -35,11 +35,7 @@ class PostController extends Controller
         'body' => 'required|min:20',
     ]);
 
-    $post = Post::create([
-        'title' => $validated['title'],
-        'body' => $validated['body'],
-        'user_id' => 1,  
-    ]);
+    auth()->user()->posts()->create($validated);
 
     return redirect('/posts')->with('success', 'Post created successfully!');
 }
